@@ -8,12 +8,9 @@ extern "C"{
 #include "arm_math.h"
 }
 
-static constexpr PWM_Channel _Trigger_Channel = PWM_CHANNEL_F;
+static constexpr PWM_Channel _Trigger_Channel = PWM_CHANNEL_A;
 static constexpr float _Trigger_OnAngle = 0.0f;
 static constexpr float _Trigger_OffAngle = 60.0f;
-
-static constexpr float _CarBaseLength = 580.0f;
-static constexpr float _TriggerBaseLength = 10.0f;
 
 enum PID_TrackMode
 {
@@ -28,38 +25,6 @@ static volatile PID_TrackMode _car_track_mode, _trigger_track_mode;
 
 static volatile float _car_target_rpm = 0.0f, _car_target_pos = 0.0f, _car_position_offset = 0.0f;
 static volatile float _trigger_target_rpm = 0.0f, _trigger_target_pos = 0.0f, _trigger_position_offset = 0.0f;
-
-void TrailerControl::GoLock(CancellationToken& token) {
-    TriggerGoToPosition(_TriggerBaseLength);
-    while (fabsf(TriggerGetPositon() - _TriggerBaseLength) > 10 && !token.cancel) {
-        HAL_Delay(10);
-    }
-    CarGoToPosition(_CarBaseLength);
-    while (fabsf(CarGetPositon() - _CarBaseLength) > 10 && !token.cancel) {
-        HAL_Delay(10);
-    }
-    // Calib zero pos fast
-    CarSetSpeed(-50.0f);
-    uint16_t sample_count = 0;
-    float average_rpm = 0.0f;
-    for (;;)
-    {
-        average_rpm += Trailer::GetLeft().motor_rpm / 500.0f;
-        sample_count++;
-        if (sample_count == 500)
-        {
-            if (fabsf(average_rpm) < 1)
-            {
-                CarSetSpeed(0.0f);
-                CarResetPosition();
-                break;
-            }
-            average_rpm = 0.0f;
-            sample_count = 0;
-        }
-        HAL_Delay(1);
-    }
-}
 
 void TrailerControl::ZeroPosCaliberate() {
     Asynchronous beep_task([] {

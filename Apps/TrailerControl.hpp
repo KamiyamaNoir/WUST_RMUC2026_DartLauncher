@@ -23,8 +23,6 @@ public:
     static void TriggerOn();
     static void TriggerOff();
 
-    static void GoLock(CancellationToken& token);
-
     static void ZeroPosCaliberate();
 
     static void CalcusInvoke();

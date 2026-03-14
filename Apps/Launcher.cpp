@@ -31,28 +31,10 @@ void Launcher::Run()
 
     ZDT_X42::Enable(true);
 
-    CorePWM::SetAngle(PWM_CHANNEL_Z, 135);
-    CorePWM::Start(PWM_CHANNEL_Z);
-
-    PWR_CTR1_GPIO_Port->BSRR = PWR_CTR1_Pin;
-
-    float target_angle = 0;
+    ReloaderControl::PowerOn();
 
     for (;;) {
         auto& rc = ET16S::Get();
-
-        if (rc.channel[4] > 0.8) {
-            PWR_CTR2_GPIO_Port->BSRR = PWR_CTR2_Pin;
-        }
-        else {
-            PWR_CTR2_GPIO_Port->BSRR = PWR_CTR2_Pin << 16;
-        }
-
-        target_angle += rc.channel[0] * 90.0f * 0.01f;
-        // ReloaderControl::SetSpeed(rc.channel[0] * 200);
-        ReloaderControl::SetPositon(target_angle);
-        // printf("%f,%f\r\n", Trailer::GetReloader().motor_rpm, Trailer::GetReloader().total_angle_speed);
-        printf("%f,%f\r\n", target_angle, Trailer::GetReloader().getTotalAngle());
         HAL_Delay(10);
     }
 }
