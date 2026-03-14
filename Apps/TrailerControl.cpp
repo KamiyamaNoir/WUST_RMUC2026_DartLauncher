@@ -31,11 +31,11 @@ static volatile float _trigger_target_rpm = 0.0f, _trigger_target_pos = 0.0f, _t
 
 void TrailerControl::GoLock(CancellationToken& token) {
     TriggerGoToPosition(_TriggerBaseLength);
-    while (fabsf(TriggerGetPositon() - _TriggerBaseLength) < 10 && !token.cancel) {
+    while (fabsf(TriggerGetPositon() - _TriggerBaseLength) > 10 && !token.cancel) {
         HAL_Delay(10);
     }
     CarGoToPosition(_CarBaseLength);
-    while (fabsf(CarGetPositon() - _CarBaseLength) < 10 && !token.cancel) {
+    while (fabsf(CarGetPositon() - _CarBaseLength) > 10 && !token.cancel) {
         HAL_Delay(10);
     }
     // Calib zero pos fast
@@ -152,7 +152,7 @@ void TrailerControl::Setup() {
 
     _trigger_position_pid.output_limit_up = 400.0f;
     _trigger_position_pid.output_limit_down = -400.0f;
-    _trigger_position_pid.Kp = 10.0f;
+    _trigger_position_pid.Kp = 100.0f;
 
     CorePWM::SetAngle(_Trigger_Channel, _Trigger_OffAngle);
     CorePWM::Start(_Trigger_Channel);

@@ -7,9 +7,9 @@ void CoreCAN::Setup() {
         // 0x201, 0x202为C620
         .FilterIdHigh = 0x201 << 5,
         .FilterIdLow = 0x202 << 5,
-        // 0x203为C610
+        // 0x203为C610, 0x205为GM6020
         .FilterMaskIdHigh = 0x203 << 5,
-        .FilterMaskIdLow = 0x0000,
+        .FilterMaskIdLow = 0x205 << 5,
 
         .FilterFIFOAssignment = CAN_FilterFIFO0,
         .FilterBank = 0,

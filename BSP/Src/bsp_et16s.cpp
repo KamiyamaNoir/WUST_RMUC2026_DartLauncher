@@ -50,7 +50,7 @@ void ET16S::UART_Receive_Callback(uint16_t len) {
     Setup();
 }
 
-ET16S_Data ET16S::Get() {
+ET16S_Data& ET16S::Get() {
     return _data;
 }
 

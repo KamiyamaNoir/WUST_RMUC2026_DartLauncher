@@ -23,7 +23,7 @@ public:
 
     static void UART_Receive_Callback(uint16_t len);
 
-    static ET16S_Data Get();
+    static ET16S_Data& Get();
 };
 
 #endif
