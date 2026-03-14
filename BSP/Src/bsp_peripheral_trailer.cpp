@@ -51,9 +51,36 @@ void Trailer::SetCurrent(float ampere_left, float ampere_right, float ampere_cen
     HAL_CAN_AddTxMessage(_Can, &_header, buffer, &mail);
 }
 
-void Trailer::SetReloaderCurrent(float ampere) {
+// void Trailer::SetReloaderCurrent(float ampere) {
+//     const CAN_TxHeaderTypeDef _header = {
+//         .StdId = 0x1FE,
+//         .ExtId = 0,
+//         .IDE = CAN_ID_STD,
+//         .RTR = CAN_RTR_DATA,
+//         .DLC = 8,
+//         .TransmitGlobalTime = DISABLE,
+//     };
+//
+//     auto am = static_cast<int16_t>(ampere * (16384.0f / 3.0f));
+//
+//     uint8_t buffer[8] = {
+//         static_cast<uint8_t>(am >> 8),
+//         static_cast<uint8_t>(am & 0xFF),
+//         0x00,
+//         0x00,
+//         0x00,
+//         0x00,
+//         0x00,
+//         0x00,
+//     };
+//
+//     uint32_t mail;
+//     HAL_CAN_AddTxMessage(_Can, &_header, buffer, &mail);
+// }
+
+void Trailer::SetReloaderVoltage(int16_t voltage) {
     const CAN_TxHeaderTypeDef _header = {
-        .StdId = 0x1FE,
+        .StdId = 0x1FF,
         .ExtId = 0,
         .IDE = CAN_ID_STD,
         .RTR = CAN_RTR_DATA,
@@ -61,11 +88,14 @@ void Trailer::SetReloaderCurrent(float ampere) {
         .TransmitGlobalTime = DISABLE,
     };
 
-    auto am = static_cast<int16_t>(ampere * (16384.0f / 3.0f));
+    if (voltage > 25000)
+        voltage = 25000;
+    else if (voltage < -25000)
+        voltage = -25000;
 
     uint8_t buffer[8] = {
-        static_cast<uint8_t>(am >> 8),
-        static_cast<uint8_t>(am & 0xFF),
+        static_cast<uint8_t>(voltage >> 8),
+        static_cast<uint8_t>(voltage & 0xFF),
         0x00,
         0x00,
         0x00,
@@ -116,6 +146,14 @@ void GM6020_Data::ParseData(const uint8_t pak[8]) {
     else if (delta_angle < -180.0f)
         yaw_count++;
     motor_angle = angle;
+}
+
+void Trailer::Timebase_5ms() {
+    float angle = _reloader.getTotalAngle();
+    float delta = (angle - _reloader.total_angle_last) / 0.005f / 6.0f;
+    _reloader.total_angle_last = angle;
+    _reloader.total_angle_speed = 0.3f * delta + (1 - 0.3f) * _reloader.total_angle_speed_last;
+    _reloader.total_angle_speed_last = _reloader.total_angle_speed;
 }
 
 C620_Data& Trailer::GetLeft() {

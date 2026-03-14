@@ -6,8 +6,8 @@
 #include "bsp_et16s.hpp"
 #include "bsp_peripheral_stepper.hpp"
 #include "bsp_peripheral_trailer.hpp"
+#include "ReloaderControl.hpp"
 #include "TrailerControl.hpp"
-#include "Reloader/Reloader.hpp"
 
 enum
 {
@@ -24,37 +24,42 @@ static volatile LauncherMode _mode = MODE_MANUAL;
 
 void Launcher::Run()
 {
-    Reloader::Setup();
     TrailerControl::Setup();
+    ReloaderControl::Setup();
 
     CoreTimer::SetupTimebase();
 
     ZDT_X42::Enable(true);
 
-    Asynchronous report([] {
-        for (;;) {
-            // printf("%f,%f\r\n", TrailerControl::CarGetPositon(), TrailerControl::TriggerGetPositon());
-            printf("%f\r\n", Trailer::GetReloader().getTotalAngle());
-            HAL_Delay(50);
-        }
-    }, "report", 2);
-
-    CorePWM::SetAngle(PWM_CHANNEL_Z, 90);
+    CorePWM::SetAngle(PWM_CHANNEL_Z, 135);
     CorePWM::Start(PWM_CHANNEL_Z);
 
     PWR_CTR1_GPIO_Port->BSRR = PWR_CTR1_Pin;
 
-    PWR_CTR2_GPIO_Port->BSRR = PWR_CTR2_Pin;
+    float target_angle = 0;
 
     for (;;) {
         auto& rc = ET16S::Get();
-        Trailer::SetReloaderCurrent(rc.channel[0] * 3);
-        HAL_Delay(20);
+
+        if (rc.channel[4] > 0.8) {
+            PWR_CTR2_GPIO_Port->BSRR = PWR_CTR2_Pin;
+        }
+        else {
+            PWR_CTR2_GPIO_Port->BSRR = PWR_CTR2_Pin << 16;
+        }
+
+        target_angle += rc.channel[0] * 90.0f * 0.01f;
+        // ReloaderControl::SetSpeed(rc.channel[0] * 200);
+        ReloaderControl::SetPositon(target_angle);
+        // printf("%f,%f\r\n", Trailer::GetReloader().motor_rpm, Trailer::GetReloader().total_angle_speed);
+        printf("%f,%f\r\n", target_angle, Trailer::GetReloader().getTotalAngle());
+        HAL_Delay(10);
     }
 }
 
 void Launcher::Timebase_1ms() {
     TrailerControl::CalcusInvoke();
+    ReloaderControl::CalcusInvoke();
 }
 
 void Launcher::RC_OnChannelChanged() {

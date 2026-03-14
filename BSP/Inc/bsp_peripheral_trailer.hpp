@@ -54,6 +54,10 @@ struct GM6020_Data
 
     int32_t yaw_count = 0;
 
+    float total_angle_last = 0.0f;
+    float total_angle_speed = 0.0f;
+    float total_angle_speed_last = 0.0f;
+
     // unit: degree ° (Relative)
     float motor_angle = 0.0f;
     // unit: Rotate per Minitus (Signed)
@@ -74,9 +78,13 @@ public:
 
     static void ParseData(uint16_t can_id, uint8_t pak[8]);
 
+    static void Timebase_5ms();
+
     static void SetCurrent(float ampere_left, float ampere_right, float ampere_center);
 
-    static void SetReloaderCurrent(float ampere);
+    // static void SetReloaderCurrent(float ampere);
+
+    static void SetReloaderVoltage(int16_t voltage);
 
     static C620_Data& GetLeft();
     static C620_Data& GetRight();

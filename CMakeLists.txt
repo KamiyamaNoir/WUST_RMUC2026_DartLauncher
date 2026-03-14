@@ -45,14 +45,12 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # source code
 file(GLOB_RECURSE BSP_SOURCE "./BSP/Src/*.cpp")
 file(GLOB_RECURSE APP_SOURCE "./Apps/*.cpp")
-file(GLOB_RECURSE RELOAD_SOURCE "./Apps/Reloader/*.cpp")
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
         ${BSP_SOURCE}
         ${APP_SOURCE}
-        ${RELOAD_SOURCE}
 
         ./Lib/zcbor/src/zcbor_common.c
         ./Lib/zcbor/src/zcbor_decode.c
