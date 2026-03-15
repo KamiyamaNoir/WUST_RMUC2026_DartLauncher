@@ -28,7 +28,6 @@ enum
 {
     ACTION_NONE,
     ACTION_CALIB,
-    ACTION_RELOAD,
     ACTION_LAUNCH,
 } _action;
 
@@ -38,8 +37,6 @@ static void Action() {
     switch (_action) {
     case ACTION_CALIB:
         channel = RC_CHANNEL_CALIB;break;
-    case ACTION_RELOAD:
-        channel = RC_CHANNEL_RELOAD;break;
     default:
         channel = RC_CHANNEL_LAUNCH;break;
     };
@@ -50,9 +47,6 @@ static void Action() {
 
     if (_action == ACTION_CALIB) {
         TrailerControl::ZeroPosCaliberate();
-    }
-    else if (_action == ACTION_RELOAD) {
-        LaunchControl::Next();
     }
     else if (_action == ACTION_LAUNCH) {
         TrailerControl::TriggerOn();
@@ -87,6 +81,14 @@ void Launcher::Run()
         if (_mode == MODE_AUTO && _action != ACTION_NONE) {
             Action();
         }
+        else if (_mode == MODE_AUTO && rc.channel[RC_CHANNEL_RELOAD] > 0.8) {
+            LaunchControl::Next();
+            if (rc.channel[RC_CHANNEL_RELOAD] > 0.8) {
+                TrailerControl::TriggerOn();
+                HAL_Delay(1000);
+                TrailerControl::TriggerOff();
+            }
+        }
         else if (_mode == MODE_MAUNUAL) {
             _action = ACTION_NONE;
             if (rc.channel[10] > 0) {
@@ -102,11 +104,11 @@ void Launcher::Run()
             else {
                 TrailerControl::TriggerOff();
             }
-        }
 
-        TrailerControl::SetCarSpeed(rc.channel[1] * 100);
-        TrailerControl::SetTriggerSpeed(rc.channel[0] * 400);
-        ZDT_X42::SetSpeed(rc.channel[3] * 1000);
+            TrailerControl::SetCarSpeed(rc.channel[1] * 100);
+            TrailerControl::SetTriggerSpeed(rc.channel[0] * 400);
+            ZDT_X42::SetSpeed(rc.channel[3] * 1000);
+        }
 
         HAL_Delay(10);
     }
@@ -140,9 +142,6 @@ void Launcher::RC_OnChannelChanged() {
     //// Action List ////
     if (rc.channel[RC_CHANNEL_CALIB] > 0.8) {
         _action = ACTION_CALIB;
-    }
-    if (rc.channel[RC_CHANNEL_RELOAD] > 0.8) {
-        _action = ACTION_RELOAD;
     }
     if (rc.channel[RC_CHANNEL_LAUNCH] > 0.8) {
         _action = ACTION_LAUNCH;

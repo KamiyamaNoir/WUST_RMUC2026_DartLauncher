@@ -95,13 +95,13 @@ void TrailerControl::ZeroPosCaliberate() {
 
 void TrailerControl::Setup() {
     _left_speed_pid.output_limit_up = 20.0f;
-    _left_speed_pid.output_limit_down = -1.0f;
-    _right_speed_pid.output_limit_up = 1.0f;
+    _left_speed_pid.output_limit_down = -0.7f;
+    _right_speed_pid.output_limit_up = 0.7f;
     _right_speed_pid.output_limit_down = -20.0f;
 
     _left_speed_pid.integral_limit_up = 20.0f;
-    _left_speed_pid.integral_limit_down = -1.0f;
-    _right_speed_pid.integral_limit_up = 1.0f;
+    _left_speed_pid.integral_limit_down = -0.7f;
+    _right_speed_pid.integral_limit_up = 0.7f;
     _right_speed_pid.integral_limit_down = -20.0f;
 
     _right_speed_pid.Kp = _left_speed_pid.Kp = 0.43;

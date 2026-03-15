@@ -10,9 +10,6 @@ static constexpr float _CarTriggerOffset = 580.0f;
 // 装载位置
 static constexpr float _CarLoadPosition = 450.0f;
 
-// 发射的位置，参考点为扳机起始点
-static float _LaunchPosition = 0.0f;
-
 enum LaunchStage
 {
     LAUNCH_STAGE_1,
@@ -63,9 +60,8 @@ void LaunchControl::Next() {
 
     /** 以下为自动发射逻辑 可跳过 **/
     // 到达发射位
-    TrailerControl::TriggerGoToPosition(_LaunchPosition);
-    TrailerControl::CarGoToPosition(_LaunchPosition + _CarTriggerOffset);
-    while (fabsf(TrailerControl::GetCarPosition() - (_LaunchPosition + _CarTriggerOffset)) > 10) {
+    TrailerControl::CarGoToPosition(TrailerControl::GetTriggerPositon() + _CarTriggerOffset);
+    while (fabsf(TrailerControl::GetCarPosition() - (TrailerControl::GetTriggerPositon() + _CarTriggerOffset)) > 10) {
         HAL_Delay(10);
     }
     // 回撤拖车
@@ -84,7 +80,7 @@ void LaunchControl::FastCarCaliberate() {
         sample_count++;
         if (sample_count == sample_exp)
         {
-            if (fabsf(average_rpm) < 5)
+            if (fabsf(average_rpm) < 15)
             {
                 TrailerControl::SetCarSpeed(0.0f);
                 TrailerControl::ResetCarPosition();
