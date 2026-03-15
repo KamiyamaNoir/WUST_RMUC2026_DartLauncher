@@ -107,8 +107,8 @@ void TrailerControl::Setup() {
     _right_speed_pid.Kp = _left_speed_pid.Kp = 0.43;
     _right_speed_pid.Ki = _left_speed_pid.Ki = 0.03;
 
-    _car_position_pid.output_limit_up = 200.0f;
-    _car_position_pid.output_limit_down = -200.0f;
+    _car_position_pid.output_limit_up = 100.0f;
+    _car_position_pid.output_limit_down = -100.0f;
     _car_position_pid.Kp = 10.0f;
 
     _trigger_speed_pid.output_limit_up = 10.0f;

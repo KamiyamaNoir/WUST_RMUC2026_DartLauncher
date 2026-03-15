@@ -73,7 +73,7 @@ void LaunchControl::FastCarCaliberate() {
 
     uint16_t sample_count = 0;
     float average_rpm = 0.0f;
-    TrailerControl::SetCarSpeed(-200.0f);
+    TrailerControl::SetCarSpeed(-100.0f);
     for (;;)
     {
         average_rpm += Trailer::GetLeft().motor_rpm / sample_exp;
