@@ -1,14 +1,6 @@
 #ifndef MISSILELAUNCHER_LAUNCHER_H
 #define MISSILELAUNCHER_LAUNCHER_H
 
-enum LauncherMode
-{
-    MODE_STOP,
-    MODE_MANUAL,
-    MODE_AUTO,
-};
-
-
 class Launcher
 {
 public:

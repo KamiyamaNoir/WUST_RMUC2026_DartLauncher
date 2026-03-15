@@ -5,8 +5,8 @@
 
 // Hover 舵机
 static constexpr PWM_Channel _HoverServoChannel = PWM_CHANNEL_Z;
-static constexpr float _HoverServoUpperAngle = 135;
-static constexpr float _HoverServoLowerAngle = 90;
+static constexpr float _HoverServoUpperAngle = 160;
+static constexpr float _HoverServoLowerAngle = 115;
 
 // 角度信息
 static constexpr float _ReloaderBaseAngle = 0;
@@ -24,10 +24,10 @@ void ReloaderControl::Setup() {
     _speed_pid.Ki = 1;
     _speed_pid.Kf = 200;
 
-    _position_pid.output_limit_up = 5.0f;
-    _position_pid.output_limit_down = -5.0f;
-    _position_pid.integral_limit_up = 5.0f;
-    _position_pid.integral_limit_down = -5.0f;
+    _position_pid.output_limit_up = 25.0f;
+    _position_pid.output_limit_down = -25.0f;
+    _position_pid.integral_limit_up = 25.0f;
+    _position_pid.integral_limit_down = -25.0f;
 
     _position_pid.Kp = 5;
     _position_pid.Kd = 10;
@@ -41,6 +41,11 @@ void ReloaderControl::Setup() {
 void ReloaderControl::PowerOn() {
     PWR_CTR1_GPIO_Port->BSRR = PWR_CTR1_Pin;
     PWR_CTR2_GPIO_Port->BSRR = PWR_CTR2_Pin;
+}
+
+void ReloaderControl::PowerOff() {
+    PWR_CTR1_GPIO_Port->BSRR = PWR_CTR1_Pin << 16;
+    PWR_CTR2_GPIO_Port->BSRR = PWR_CTR2_Pin << 16;
 }
 
 void ReloaderControl::HoverUp() {

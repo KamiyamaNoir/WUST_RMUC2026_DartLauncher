@@ -38,7 +38,7 @@ void TrailerControl::ZeroPosCaliberate() {
         }
     }, "beep", 1);
     // Caliberate Car
-    CarSetSpeed(-20.0f);
+    SetCarSpeed(-20.0f);
 
     uint16_t sample_count = 0;
     float average_rpm = 0.0f;
@@ -51,8 +51,8 @@ void TrailerControl::ZeroPosCaliberate() {
         {
             if (fabsf(average_rpm) < 1)
             {
-                CarSetSpeed(0.0f);
-                CarResetPosition();
+                SetCarSpeed(0.0f);
+                ResetCarPosition();
                 break;
             }
             average_rpm = 0.0f;
@@ -63,7 +63,7 @@ void TrailerControl::ZeroPosCaliberate() {
     }
 
     TriggerPowerLimit(1.0f, -1.0f);
-    TriggerSetSpeed(-200.0f);
+    SetTriggerSpeed(-200.0f);
     sample_count = 0;
     average_rpm = 0.0f;
     for (;;)
@@ -75,8 +75,8 @@ void TrailerControl::ZeroPosCaliberate() {
         {
             if (fabsf(average_rpm) < 1)
             {
-                TriggerSetSpeed(0);
-                TriggerResetPosition();
+                SetTriggerSpeed(0);
+                ResetTriggerPosition();
                 break;
             }
             average_rpm = 0.0f;
@@ -95,21 +95,21 @@ void TrailerControl::ZeroPosCaliberate() {
 
 void TrailerControl::Setup() {
     _left_speed_pid.output_limit_up = 20.0f;
-    _left_speed_pid.output_limit_down = -3.0f;
-    _right_speed_pid.output_limit_up = 3.0f;
+    _left_speed_pid.output_limit_down = -1.0f;
+    _right_speed_pid.output_limit_up = 1.0f;
     _right_speed_pid.output_limit_down = -20.0f;
 
     _left_speed_pid.integral_limit_up = 20.0f;
-    _left_speed_pid.integral_limit_down = -3.0f;
-    _right_speed_pid.integral_limit_up = 3.0f;
+    _left_speed_pid.integral_limit_down = -1.0f;
+    _right_speed_pid.integral_limit_up = 1.0f;
     _right_speed_pid.integral_limit_down = -20.0f;
 
     _right_speed_pid.Kp = _left_speed_pid.Kp = 0.43;
     _right_speed_pid.Ki = _left_speed_pid.Ki = 0.03;
 
-    _car_position_pid.output_limit_up = 100.0f;
-    _car_position_pid.output_limit_down = -100.0f;
-    _car_position_pid.Kp = 16.0f;
+    _car_position_pid.output_limit_up = 200.0f;
+    _car_position_pid.output_limit_down = -200.0f;
+    _car_position_pid.Kp = 10.0f;
 
     _trigger_speed_pid.output_limit_up = 10.0f;
     _trigger_speed_pid.output_limit_down = -10.0f;
@@ -138,7 +138,7 @@ void TrailerControl::CarPowerLimit(float load, float release) {
     _right_speed_pid.output_limit_down = -load;
 }
 
-void TrailerControl::CarSetSpeed(float rpm) {
+void TrailerControl::SetCarSpeed(float rpm) {
     _car_target_rpm = rpm;
     _car_track_mode = PID_TRACK_SPEED;
 }
@@ -148,11 +148,11 @@ void TrailerControl::CarGoToPosition(float pos) {
     _car_track_mode = PID_TRACK_POSITION;
 }
 
-float TrailerControl::CarGetPositon() {
+float TrailerControl::GetCarPosition() {
     return (Trailer::GetLeft().getTotalAngle() * (187.0f / 3591.0f) * PI / 180.0f * 16.81f) - _car_position_offset;
 }
 
-void TrailerControl::CarResetPosition() {
+void TrailerControl::ResetCarPosition() {
     _car_position_offset = (Trailer::GetLeft().getTotalAngle() * (187.0f / 3591.0f) * PI / 180.0f * 16.81f);
 }
 
@@ -161,7 +161,7 @@ void TrailerControl::TriggerPowerLimit(float up, float down) {
     _trigger_speed_pid.output_limit_down = down;
 }
 
-void TrailerControl::TriggerSetSpeed(float rpm) {
+void TrailerControl::SetTriggerSpeed(float rpm) {
     _trigger_target_rpm = rpm;
     _trigger_track_mode = PID_TRACK_SPEED;
 }
@@ -171,24 +171,24 @@ void TrailerControl::TriggerGoToPosition(float pos) {
     _trigger_track_mode = PID_TRACK_POSITION;
 }
 
-float TrailerControl::TriggerGetPositon() {
+float TrailerControl::GetTriggerPositon() {
     return Trailer::GetCenter().getTotalAngle() / 12960.0f * 2.0f - _trigger_position_offset;
 }
 
-void TrailerControl::TriggerResetPosition() {
+void TrailerControl::ResetTriggerPosition() {
     _trigger_position_offset = (Trailer::GetCenter().getTotalAngle() / 12960.0f * 2.0f);
 }
 
 void TrailerControl::CalcusInvoke() {
     if (_car_track_mode == PID_TRACK_POSITION)
     {
-        _car_position_pid.Calc(_car_target_pos - CarGetPositon());
+        _car_position_pid.Calc(_car_target_pos - GetCarPosition());
         _car_target_rpm = _car_position_pid.out;
     }
 
     if (_trigger_track_mode == PID_TRACK_POSITION)
     {
-        float err = _trigger_target_pos - TriggerGetPositon();
+        float err = _trigger_target_pos - GetTriggerPositon();
         if (fabsf(err) < 0.1f)
         {
             _trigger_track_mode = PID_TRACK_SPEED;

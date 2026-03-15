@@ -14,6 +14,7 @@ class ReloaderControl
 public:
     static void Setup();
     static void PowerOn();
+    static void PowerOff();
 
     static void HoverUp();
     static void HoverDown();
