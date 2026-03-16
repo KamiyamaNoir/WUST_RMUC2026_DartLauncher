@@ -8,10 +8,7 @@ extern "C"{
 
 __PACKED_STRUCT DataFrame
 {
-    int32_t msg;
-    float x;
-    float y;
-    float dis;
+    float delta;
     uint32_t sum;
 };
 
