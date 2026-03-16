@@ -17,6 +17,7 @@ public:
     static void PowerOff();
 
     static void HoverUp();
+    static void HoverMiddle();
     static void HoverDown();
 
     static void GoStage(ReloaderStage stage);

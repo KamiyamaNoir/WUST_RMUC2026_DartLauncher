@@ -4,9 +4,10 @@
 #include "FeedbackControl.hpp"
 
 // Hover 舵机
-static constexpr PWM_Channel _HoverServoChannel = PWM_CHANNEL_Z;
-static constexpr float _HoverServoUpperAngle = 160;
-static constexpr float _HoverServoLowerAngle = 110;
+static constexpr PWM_Channel _HoverServoChannel = PWM_CHANNEL_B;
+static constexpr float _HoverServoUpperAngle = 150;
+static constexpr float _HoverServoMiddleAngle = 135;
+static constexpr float _HoverServoLowerAngle = 112;
 
 // 角度信息
 static constexpr float _ReloaderBaseAngle = 0;
@@ -50,6 +51,10 @@ void ReloaderControl::PowerOff() {
 
 void ReloaderControl::HoverUp() {
     CorePWM::SetAngle(_HoverServoChannel, _HoverServoUpperAngle);
+}
+
+void ReloaderControl::HoverMiddle() {
+    CorePWM::SetAngle(_HoverServoChannel, _HoverServoMiddleAngle);
 }
 
 void ReloaderControl::HoverDown() {

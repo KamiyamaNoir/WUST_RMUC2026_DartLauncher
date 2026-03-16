@@ -33,7 +33,7 @@ void LaunchControl::Next() {
     // 从第二发开始，需要换弹
     if (_stage > LAUNCH_STAGE_1) {
         // 下调转盘
-        ReloaderControl::HoverDown();
+        ReloaderControl::HoverMiddle();
         HAL_Delay(500);
         // 转盘换弹
         ReloaderControl::GoStage(static_cast<ReloaderStage>(_stage));
@@ -73,7 +73,7 @@ void LaunchControl::FastCarCaliberate() {
 
     uint16_t sample_count = 0;
     float average_rpm = 0.0f;
-    TrailerControl::SetCarSpeed(-100.0f);
+    TrailerControl::SetCarSpeed(-50.0f);
     for (;;)
     {
         average_rpm += Trailer::GetLeft().motor_rpm / sample_exp;
